@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
 
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-
-from matplotlib import pyplot as plt
 
 #1 读取数据
 train=pd.read_csv('FE_pima-indians-diabetes.csv')
@@ -24,10 +23,9 @@ X_trian=csr_matrix(X_trian)
 
 #3 分割数据
 from sklearn.model_selection import train_test_split
-X_trian_part,X_val,y_train_part,y_val=train_test_split(X_trian,y_trian,
+X_trian_part,X_val,y_trian_part,y_val=train_test_split(X_trian,y_trian,
                                                        train_size=0.8,
-                                                       random_state=0
-                    )
+                                                       random_state=0)
 #print(X_trian_part.shape)
 
 #4 SVM默认参数调优
@@ -48,7 +46,7 @@ from sklearn.svm import LinearSVC
 
 
 #线性SVM正则参数调优
-def fit_grid_point_Linear(C,X_trian,y_trian,X_val,y_val):
+'''def fit_grid_point_Linear(C,X_trian,y_trian,X_val,y_val):
     SVC2=LinearSVC(C=C,penalty='l2')
     SVC2.fit(X_trian,y_trian)
     #y_predict=SVC2.predict(X_val)
@@ -84,14 +82,49 @@ SVC3=LinearSVC(C=Best_C)
 SVC3.fit(X_trian,y_trian)
 #保存模型，用于后续测试
 import pickle as pk
-pk.dump(SVC3,open("Pima_indians_LinearSVC.pkl",'wb'))
+pk.dump(SVC3,open("Pima_indians_LinearSVC.pkl",'wb'))'''
 
 
+#C_range=np.logspace(-5,5,11)
+#param_grid=dict(gamma=gamma_range)
+'''for i,value in enumerate(C_range):
+    svc.C=value
+    grid=GridSearchCV(svc,param_grid=gamma_range,cv=5)
+    grid.fit(X_trian_part,y_trian_part)
+    #svc.fit(X_trian_part,y_trian_part)
+    #grid.score(X_val,y_val)
+    y_predict=grid.predict(X_val)
 
+    accuracy=accuracy_score(y_val,y_predict)
+    print("C={} accuracy={}".format(value,accuracy))
+    print("params={} scores={}".format(grid.best_params_,grid.best_score_))'''
 
+#svc=LinearSVC(C=0.01)
+#param_range=[0.001,0.01,0.1,1,10,100,1000]
+#param_grid=[{'svc_C':param_range,'svc_kernel':['linear']}]
+parameters = {'kernel':['linear'], 'C':[0.001,0.01,0.1,1,10,100], 'gamma':[0.0001,0.001,0.01,0.1,1,10,100]}
+grid=GridSearchCV(SVC(),param_grid=parameters,cv=5)
+grid.fit(X_trian_part,y_trian_part)
+y_predict=grid.predict(X_val)
+accuracy=accuracy_score(y_val,y_predict)
+print("accuracy={}".format(accuracy))
+print("params={} scores={}".format(grid.best_params_,grid.best_score_))
+print('*'*40)
+#rbf核
+parameters = {'kernel':['rbf'], 'C':[0.001,0.01,0.1,1,10,100], 'gamma':[0.0001,0.001,0.01,0.1,1,10,100]}
+grid=GridSearchCV(SVC(),param_grid=parameters,cv=5)
+grid.fit(X_trian_part,y_trian_part)
+y_predict=grid.predict(X_val)
+accuracy=accuracy_score(y_val,y_predict)
+print("accuracy={}".format(accuracy))
+print("params={} scores={}".format(grid.best_params_,grid.best_score_))
+print('*'*40)
 
-
-
-
-
-
+#linear核与rbf核一起调参
+parameters = {'kernel':['rbf','linear'], 'C':[0.001,0.01,0.1,1,10,100], 'gamma':[0.0001,0.001,0.01,0.1,1,10,100]}
+grid=GridSearchCV(SVC(),param_grid=parameters,cv=5)
+grid.fit(X_trian_part,y_trian_part)
+y_predict=grid.predict(X_val)
+accuracy=accuracy_score(y_val,y_predict)
+print("accuracy={}".format(accuracy))
+print("params={} scores={}".format(grid.best_params_,grid.best_score_))
