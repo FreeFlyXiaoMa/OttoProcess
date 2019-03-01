@@ -11,4 +11,6 @@ lr.fit(X_train,y_train)
 print('截距项',lr.intercept_)
 print('权重：',lr.coef_[0])
 #plt.scatter(X_train,y_train,label='scatter')
-#plt.show()
+#plt.show()DDDDD
+
+###
